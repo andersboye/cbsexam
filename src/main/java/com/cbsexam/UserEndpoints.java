@@ -1,5 +1,6 @@
 package com.cbsexam;
 
+import cache.UserCache;
 import com.google.gson.Gson;
 import controllers.UserController;
 import java.util.ArrayList;
@@ -46,7 +47,9 @@ public class UserEndpoints {
     Log.writeLog(this.getClass().getName(), this, "Get all users", 0);
 
     // Get a list of users
-    ArrayList<User> users = UserController.getUsers();
+    // Her er der lagt cache på, forceupdate sættes til false.
+    UserCache userCache = new UserCache();
+    ArrayList<User> users = userCache.getUsers(false);
 
     // TODO: Add Encryption to JSON - FIXED!
     // Transfer users to json in order to return it to the user

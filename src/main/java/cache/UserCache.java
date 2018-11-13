@@ -1,7 +1,6 @@
 package cache;
 
 import controllers.UserController;
-import model.Order;
 import model.User;
 import utils.Config;
 
