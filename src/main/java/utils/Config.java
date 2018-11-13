@@ -24,11 +24,15 @@ public final class Config {
   //new line
   private static long USER_TTL;
   private static long ORDER_TTL;
+  private static String SALT;
   public static long getOrderTtl() {
       return ORDER_TTL;
   }
   public static long getUserTtl() {
     return USER_TTL;
+  }
+  public static String getSalt() {
+    return SALT;
   }
 
 
@@ -113,6 +117,7 @@ public final class Config {
 
     //New line
     USER_TTL = json.get("USER_TTL").getAsLong();
-    ORDER_TTL =json.get("ORDER_TTL").getAsLong();
+    ORDER_TTL = json.get("ORDER_TTL").getAsLong();
+    SALT = json.get("SALT").getAsString();
 }
 }
