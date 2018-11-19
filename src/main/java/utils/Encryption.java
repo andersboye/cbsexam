@@ -2,7 +2,11 @@ package utils;
 
 public final class Encryption {
 
+
+
+
   public static String encryptDecryptXOR(String rawString) {
+    char[] key = Config.getEncryptionKey();
 
     // If encryption is enabled in Config.
     if (Config.getEncryption()) {
@@ -10,7 +14,7 @@ public final class Encryption {
       // The key is predefined and hidden in code
       // TODO: Create a more complex code and store it somewhere better
       //nøglen skal gemmes "uden for koden" i config.json filen, Så man ikke kan se den i selve koden.
-      char[] key = {'C', 'B', 'S'};
+      //char[] key = {'C', 'B', 'S'};
 
       // Stringbuilder enables you to play around with strings and make useful stuff
       StringBuilder thisIsEncrypted = new StringBuilder();
@@ -28,4 +32,6 @@ public final class Encryption {
       return rawString;
     }
   }
+
+
 }
