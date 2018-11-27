@@ -92,10 +92,22 @@ public class UserEndpoints {
   @POST
   @Path("/login")
   @Consumes(MediaType.APPLICATION_JSON)
-  public Response loginUser(String x) {
+  public Response loginUser(String body) {
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    //Læser json fra bodyen og omdanner den til user klassen.
+    User user = new Gson().fromJson(body, User.class);
+
+    //Får brugeren tilbage med det tilføjede ID og returnerer den til user.
+    String token = UserController.loginUser(user);
+
+    //Returnere dataen til useren.
+    // Hvis token er forskellig fra "ikke noget" så skal den kørre status 200.
+    //Hvis token ikke er blevet oprettet/ikke indeholder noget, køres status 400 og en fejlmedelelse udskrives.
+    if (token !=""){
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE). entity(token).build();
+    } else {
+      return Response.status(400).entity("Something went wrong. Could not create user").build();
+    }
   }
 
   // TODO: Make the system able to delete users

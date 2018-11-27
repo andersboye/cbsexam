@@ -110,4 +110,7 @@ public class DatabaseController {
     // Return the resultset which at this point will be null
     return result;
   }
+
+  public void loginUser(String sql) {
+  }
 }

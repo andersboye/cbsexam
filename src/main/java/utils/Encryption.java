@@ -12,7 +12,7 @@ public final class Encryption {
     if (Config.getEncryption()) {
 
       // The key is predefined and hidden in code
-      // TODO: Create a more complex code and store it somewhere better
+      // TODO: Create a more complex code and store it somewhere better - FIXED!
       //nøglen skal gemmes "uden for koden" i config.json filen, Så man ikke kan se den i selve koden.
       //char[] key = {'C', 'B', 'S'};
 

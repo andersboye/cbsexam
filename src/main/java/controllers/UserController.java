@@ -3,6 +3,12 @@ package controllers;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import model.User;
 import utils.Hashing;
 import utils.Log;
@@ -137,4 +143,59 @@ public class UserController {
     // Return user
     return user;
   }
+
+  public static String loginUser(User user) {
+
+    //Først tjekkes der om, der er forbindelse til databasen, hvis ikke, så oprettes forbindelsen.
+    if (dbCon == null){
+      dbCon = new DatabaseController();
+    }
+
+    String sql = "SELECT * FROM user where email='" + user.getEmail() +
+            "'AND password ='" + user.getPassword() + "'";
+
+    //Skriv loginUser i DatabaseController.
+    dbCon.loginUser(sql);
+
+    //Her laves selve kaldet til serveren.
+    //Brugeren der skal logges ind gemmes i userToLogin og vi opretter en string kaldet token.
+    ResultSet resultSet = dbCon.query(sql);
+    User userToLogin;
+    String token = null;
+
+    try {
+      if (resultSet.next()){
+        userToLogin =
+                new User(
+                        resultSet.getInt("id"),
+                        resultSet.getString("first_name"),
+                        resultSet.getString("last_name"),
+                        resultSet.getString("password"),
+                        resultSet.getString("email"));
+
+        if (userToLogin != null) {
+          try {
+            Algorithm algorithm = Algorithm.HMAC256("secret");
+            token = JWT.create()
+                    .withClaim("userid",userToLogin.getId())
+                    .withIssuer("auth0")
+                    .sign(algorithm);
+          } catch (JWTCreationException e){
+            //Hvis forkert signing konfiguration eller den ikke kunne konvertere claims-
+            System.out.println(e.getMessage());
+          } finally {
+            return token;
+          }
+        }
+      } else {
+        System.out.println("No user has been found");
+      }
+    } catch (SQLException ex) {
+      System.out.println(ex.getMessage());
+    }
+    //Der skal ikke returneres noget
+    return "";
+  }
+
+
 }
