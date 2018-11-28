@@ -4,11 +4,7 @@ import cache.UserCache;
 import com.google.gson.Gson;
 import controllers.UserController;
 import java.util.ArrayList;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import model.User;
@@ -41,7 +37,9 @@ public class UserEndpoints {
     return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
   }
 
-  /** @return Responses */
+  /**
+   * @return Responses
+   */
   @GET
   @Path("/")
   public Response getUsers() {
@@ -57,7 +55,7 @@ public class UserEndpoints {
     // TODO: Add Encryption to JSON - FIXED!
     // Transfer users to json in order to return it to the user
     String json = new Gson().toJson(users);
-    
+
     // Crypteringslinjen herunder:
     json = Encryption.encryptDecryptXOR(json);
 
@@ -103,24 +101,48 @@ public class UserEndpoints {
     //Returnere dataen til useren.
     // Hvis token er forskellig fra "ikke noget" så skal den kørre status 200.
     //Hvis token ikke er blevet oprettet/ikke indeholder noget, køres status 400 og en fejlmedelelse udskrives.
-    if (token !=""){
-      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE). entity(token).build();
+    if (token != "") {
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(token).build();
     } else {
       return Response.status(400).entity("Something went wrong. Could not create user").build();
     }
   }
 
   // TODO: Make the system able to delete users
-  public Response deleteUser(String x) {
+  @DELETE
+  @Path("/{userId}/{token}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response deleteUser(@PathParam("userId") int userId, @PathParam("token") String token) {
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+    Boolean isDeleted = UserController.deleteUser(token);
+
+    if (isDeleted) {
+      //Hvis isDeleted er true, sendes en status 200 med en meddelelse om at brugeren blev slettet.
+      return Response.status(200).entity("User has been deleted").build();
+    } else {
+      //Hvis isDeleted er false, sendes status 400 med en meddelelse om at brugeren ikke kunne slettes.
+      return Response.status(400).entity("Could not delete user").build();
+    }
   }
 
-  // TODO: Make the system able to update users
-  public Response updateUser(String x) {
 
-    // Return a response with status 200 and JSON as type
-    return Response.status(400).entity("Endpoint not implemented yet").build();
+  // TODO: Make the system able to update users
+  @PUT
+  @Path("/{idUser}/{token}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public Response updateUser(@PathParam("token") String token, String body) {
+
+    User user = new Gson().fromJson(body, User.class);
+
+    Boolean isUpdated = UserController.updateUser(user, token);
+
+    if (isUpdated) {
+      //Hvis isUpdated er true, sendes en status 200 med en meddelelse om at brugeren blev opdateret.
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity("The user has been updated").build();
+    } else {
+      //Hvis isUpdated er false, sendes status 400 med en meddelelse om at brugeren ikke kunne opdateres.
+      return Response.status(400).entity("Could not update user").build();
+    }
+
   }
 }

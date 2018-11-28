@@ -1,13 +1,16 @@
 package controllers;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
 
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import model.User;
 import utils.Hashing;
@@ -196,6 +199,76 @@ public class UserController {
     //Der skal ikke returneres noget
     return "";
   }
+
+  public static boolean deleteUser(String token) {
+    //Først tjekkes der om, der er forbindelse til databasen, hvis ikke, så oprettes forbindelsen.
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+    try {
+      DecodedJWT jwt = JWT.decode(token);
+      int id = jwt.getClaim("userId").asInt();
+
+      try {
+        PreparedStatement deleteUser = dbCon.getConnection().prepareStatement("DELETE FROM user WHERE id = ?");
+
+        deleteUser.setInt(1,id);
+
+        int rowsAffected = deleteUser.executeUpdate();
+
+        if (rowsAffected == 1){
+          return true;
+        }
+
+      } catch (SQLException sql){
+        sql.printStackTrace();
+      }
+
+    } catch (JWTDecodeException e){
+      e.printStackTrace();
+    }
+
+    return false;
+  }
+
+  public static Boolean updateUser(User user, String token) {
+    //Først tjekkes der om, der er forbindelse til databasen, hvis ikke, så oprettes forbindelsen.
+    if (dbCon == null) {
+      dbCon = new DatabaseController();
+    }
+
+      try {
+        DecodedJWT jwt = JWT.decode(token);
+        int id = jwt.getClaim("userId").asInt();
+
+        try {
+          PreparedStatement updateUser = dbCon.getConnection().prepareStatement("" +
+                  "UPDATE user SET " + "first_name = ?, last_name = ?, password = ?, email = ? WHERE id = ?");
+
+          updateUser.setString(1, user.getFirstname());
+          updateUser.setString(2, user.getLastname());
+          updateUser.setString(3, user.getPassword());
+          updateUser.setString(4, user.getEmail());
+          updateUser.setInt(5, id);
+
+          int rowsAffected = updateUser.executeUpdate();
+
+          if (rowsAffected == 1) {
+            return true;
+          }
+
+        } catch (SQLException e) {
+          e.printStackTrace();
+        }
+
+      } catch (JWTDecodeException ex) {
+        ex.printStackTrace();
+      }
+
+    return false;
+  }
+
 
 
 }
