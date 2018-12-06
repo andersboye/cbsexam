@@ -154,19 +154,19 @@ public class UserController {
       dbCon = new DatabaseController();
     }
 
-    String sql = "SELECT * FROM user where email='" + user.getEmail() +
-            "'AND password ='" + user.getPassword() + "'";
 
-    //Skriv loginUser i DatabaseController.
-    dbCon.loginUser(sql);
-
-    //Her laves selve kaldet til serveren.
     //Brugeren der skal logges ind gemmes i userToLogin og vi opretter en string kaldet token.
-    ResultSet resultSet = dbCon.query(sql);
+    ResultSet resultSet;
     User userToLogin;
     String token = null;
 
     try {
+      PreparedStatement loginUser = dbCon.getConnection().prepareStatement("SELECT * FROM user where email = ? AND password = ?");
+      loginUser.setString(1,user.getEmail());
+      loginUser.setString(2,user.getPassword());
+
+      resultSet = loginUser.executeQuery();
+
       if (resultSet.next()){
         userToLogin =
                 new User(
@@ -184,7 +184,7 @@ public class UserController {
                     .withIssuer("auth0")
                     .sign(algorithm);
           } catch (JWTCreationException e){
-            //Hvis forkert signing konfiguration eller den ikke kunne konvertere claims-
+            //Hvis forkert signing konfiguration eller den ikke kunne konverterer claims
             System.out.println(e.getMessage());
           } finally {
             return token;
