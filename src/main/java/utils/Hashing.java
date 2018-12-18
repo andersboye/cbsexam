@@ -20,15 +20,15 @@ public final class Hashing {
       byte[] byteArray = md.digest(rawString.getBytes());
 
       // Initialize a string buffer
-      StringBuffer sb = new StringBuffer();
+      StringBuffer SB = new StringBuffer();
 
       // Run through byteArray one element at a time and append the value to our stringBuffer
       for (int i = 0; i < byteArray.length; ++i) {
-        sb.append(Integer.toHexString((byteArray[i] & 0xFF) | 0x100).substring(1, 3));
+        SB.append(Integer.toHexString((byteArray[i] & 0xFF) | 0x100).substring(1, 3));
       }
 
       //Convert back to a single string and return
-      return sb.toString();
+      return SB.toString();
 
     } catch (java.security.NoSuchAlgorithmException e) {
 

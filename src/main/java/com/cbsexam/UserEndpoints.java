@@ -33,8 +33,16 @@ public class UserEndpoints {
     json = Encryption.encryptDecryptXOR(json);
 
     // Return the user with the status code 200
-    // TODO: What should happen if something breaks down?
-    return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+    // TODO: What should happen if something breaks down? - FIXED!
+    //Der tjekkes om user er forskelligt fra null.
+    //Dvs. om der er blevet hentet en bruger ud fra det indskrevne ID i databasen.
+    //Hvis dette er tilfældet sendes en status 200 (en succes).
+    //Hvis der ikke bliver returneret en bruger (i user), sendes en fejl 400, med en tilhørende fejlmeddelelse.
+    if (user != null) {
+      return Response.status(200).type(MediaType.APPLICATION_JSON_TYPE).entity(json).build();
+    } else {
+      return Response.status(400).entity("Could not find the user").build();
+    }
   }
 
   /**

@@ -20,19 +20,12 @@ public final class Config {
   private static String SOLR_PATH;
   private static String SOLR_CORE;
   private static long PRODUCT_TTL;
-  private static char key1;
-  private static char key2;
-  private static char key3;
-  private static char key4;
-  private static char key5;
-  private static char key6;
-  private static char key7;
 
   //new line
   private static long USER_TTL;
   private static long ORDER_TTL;
   private static String SALT;
-  private static char[] ENCRYPTION_KEY;
+  private static String ENCRYPTION_KEY;
   public static long getOrderTtl() {
       return ORDER_TTL;
   }
@@ -42,9 +35,7 @@ public final class Config {
   public static String getSalt() {
     return SALT;
   }
-  public static char[] getEncryptionKey() {
-    return ENCRYPTION_KEY;
-  }
+  public static char[] getEncryptionKey() { return ENCRYPTION_KEY.toCharArray(); }
 
 
   public static long getProductTtl() {
@@ -130,14 +121,10 @@ public final class Config {
     USER_TTL = json.get("USER_TTL").getAsLong();
     ORDER_TTL = json.get("ORDER_TTL").getAsLong();
     SALT = json.get("SALT").getAsString();
-    key1 = json.get("KEY1").getAsCharacter();
-    key2 = json.get("KEY2").getAsCharacter();
-    key3 = json.get("KEY3").getAsCharacter();
-    key4 = json.get("KEY4").getAsCharacter();
-    key5 = json.get("KEY5").getAsCharacter();
-    key6 = json.get("KEY6").getAsCharacter();
-    key7 = json.get("KEY7").getAsCharacter();
+    ENCRYPTION_KEY = json.get("ENCRYPTION_KEY").getAsString();
 
-    ENCRYPTION_KEY = new char[]{key1, key2, key3, key4, key5, key6, key7};
+
+
+
 }
 }
