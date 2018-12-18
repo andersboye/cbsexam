@@ -1,5 +1,6 @@
 package controllers;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class OrderController {
         Address billingAddress = AddressController.getAddress(rs.getInt("billing_address_id"));
         Address shippingAddress = AddressController.getAddress(rs.getInt("shipping_address_id"));
 
-        // Create an object instance of order from the database dataa
+        // Create an object instance of order from the database data
         order =
             new Order(
                 rs.getInt("id"),
@@ -136,23 +137,30 @@ public class OrderController {
     // Save the user to the database and save them back to initial order instance
     order.setCustomer(UserController.createUser(order.getCustomer()));
 
-    // TODO: Enable transactions in order for us to not save the order if somethings fails for some of the other inserts.
+    // TODO: Enable transactions in order for us to not save the order if somethings fails for some of the other inserts. FIXED!
+
+    Connection connection = DatabaseController.getConnection();
+    //Der indsættes en trycatch metode, for at sikre at en given ordre ikke gemmes i databasen, hvis noget går galt.
+
+
+    try {
+
 
     // Insert the product in the DB
     int orderID = dbCon.insert(
-        "INSERT INTO orders(user_id, billing_address_id, shipping_address_id, order_total, created_at, updated_at) VALUES("
-            + order.getCustomer().getId()
-            + ", "
-            + order.getBillingAddress().getId()
-            + ", "
-            + order.getShippingAddress().getId()
-            + ", "
-            + order.calculateOrderTotal()
-            + ", "
-            + order.getCreatedAt()
-            + ", "
-            + order.getUpdatedAt()
-            + ")");
+            "INSERT INTO orders(user_id, billing_address_id, shipping_address_id, order_total, created_at, updated_at) VALUES("
+                    + order.getCustomer().getId()
+                    + ", "
+                    + order.getBillingAddress().getId()
+                    + ", "
+                    + order.getShippingAddress().getId()
+                    + ", "
+                    + order.calculateOrderTotal()
+                    + ", "
+                    + order.getCreatedAt()
+                    + ", "
+                    + order.getUpdatedAt()
+                    + ")");
 
     if (orderID != 0) {
       //Update the productid of the product before returning
@@ -163,12 +171,30 @@ public class OrderController {
     ArrayList<LineItem> items = new ArrayList<LineItem>();
 
     // Save line items to database
-    for(LineItem item : order.getLineItems()){
+    for (LineItem item : order.getLineItems()) {
       item = LineItemController.createLineItem(item, order.getId());
       items.add(item);
     }
 
     order.setLineItems(items);
+
+    connection.commit();
+
+  } catch (SQLException e) {
+      try {
+        connection.rollback();
+        System.out.println("Rollback");
+      } catch (SQLException e1){
+        System.out.println("No Rollback" + e1.getMessage());
+      } finally {
+        try {
+          connection.setAutoCommit(true);
+        } catch (SQLException e2) {
+          e2.printStackTrace();
+        }
+      }
+
+    }
 
     // Return order
     return order;

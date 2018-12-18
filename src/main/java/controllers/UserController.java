@@ -112,7 +112,7 @@ public class UserController {
     Log.writeLog(UserController.class.getName(), user, "Actually creating a user in DB", 0);
 
     // Set creation time for user.
-    user.setCreatedTime(System.currentTimeMillis() / 1000L);
+    user.setCreatedTime(System.currentTimeMillis() / 10000000L);
 
     // Check for DB Connection
     if (dbCon == null) {
@@ -160,10 +160,16 @@ public class UserController {
     User userToLogin;
     String token = null;
 
+    //Her initiallisere jeg min hash.
+    Hashing HashText = new Hashing();
+
     try {
       PreparedStatement loginUser = dbCon.getConnection().prepareStatement("SELECT * FROM user where email = ? AND password = ?");
+
+      //Det af brugeren indskrevne password bliver hashet. Dette bliver så gemt i loginUser (sammen med emailen).
+      //Herefter køres en If statement, som tjekker om der findes en bruger i databasen med den indskrevne email og det hashede password.
       loginUser.setString(1,user.getEmail());
-      loginUser.setString(2,user.getPassword());
+      loginUser.setString(2,HashText.HashWSalt(user.getPassword()));
 
       resultSet = loginUser.executeQuery();
 
@@ -184,7 +190,7 @@ public class UserController {
                     .withIssuer("auth0")
                     .sign(algorithm);
           } catch (JWTCreationException e){
-            //Hvis forkert signing konfiguration eller den ikke kunne konverterer claims
+            //Hvis forkert signing konfiguration eller den ikke kunne konverterer claims så skal det catches
             System.out.println(e.getMessage());
           } finally {
             return token;
