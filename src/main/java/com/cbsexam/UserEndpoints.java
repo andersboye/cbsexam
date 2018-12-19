@@ -117,6 +117,7 @@ public class UserEndpoints {
   }
 
   // TODO: Make the system able to delete users
+  //Denne kom jeg ikke helt i mål med, så denne funktionalitet virker desværre ikke.
   @DELETE
   @Path("/{userId}/{token}")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -135,6 +136,7 @@ public class UserEndpoints {
 
 
   // TODO: Make the system able to update users
+  //Denne kom jeg ikke helt i mål med, så denne funktionalitet virker desværre ikke.
   @PUT
   @Path("/{idUser}/{token}")
   @Consumes(MediaType.APPLICATION_JSON)
